@@ -7,10 +7,12 @@ import web
 import receive
 import reply
 
+
 class Handle():
     """
         处理服务器接入和消息管理类
     """
+
     def GET(self):
         """处理Get请求，接入微信微信服务器"""
         try:
@@ -23,16 +25,14 @@ class Handle():
             echostr = data.echostr
             token = "kuange"
 
-            list = [token, timestamp, nonce]
-            list.sort()
-            sha1 = hashlib.sha1()
-            map(sha1.update, list)
-            hashcode = sha1.hexdigest()
-            print("handle/GET func:hashcode, signature", hashcode, signature)
+            s = sorted([timestamp, nonce, token])
+            # 字典排序
+            s = ''.join(s)
+            hashcode = hashlib.sha1(s.encode('utf-8')).hexdigest()
+            print('handle: GET hashcode: {} signature: {}'.format(hashcode, signature))
             if hashcode == signature:
                 return echostr
             else:
                 return ""
         except Exception as e:
             return e
-        
