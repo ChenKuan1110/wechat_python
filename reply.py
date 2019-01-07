@@ -29,7 +29,7 @@ class TextMsg(Msg):
             消息方法方法
         :return:  包含文本消息符合微信官方格式的xml数据包
         """
-        XmlForm = """
+        xml_form = """
             <xml>
             <ToUserName><![CDATA[{ToUserName}]]></ToUserName>
             <FromUserName><![CDATA[{FromUserName}]]></FromUserName>
@@ -38,7 +38,9 @@ class TextMsg(Msg):
             <Content><![CDATA[{Content}]]></Content>
             </xml>
         """
-        return XmlForm.format(**self.__dict)
+        message = xml_form.format(**self.__dict)
+        print("发送给公众号的消息是：" + message)
+        return message
 
 
 class ImageMsg(Msg):
@@ -50,7 +52,7 @@ class ImageMsg(Msg):
         self.__dict['MediaId'] = mediaId
 
     def send(self):
-        XmlForm = """
+        xml_form = """
         <xml>
         <ToUserName><![CDATA[{ToUserName}]]></ToUserName>
         <FromUserName><![CDATA[{FromUserName}]]></FromUserName>
@@ -61,4 +63,6 @@ class ImageMsg(Msg):
         </Image>
         </xml>
         """
-        return XmlForm.format(**self.__dict)
+        message = xml_form.format(**self.__dict)
+        print("发送给公众号的消息是：" + message)
+        return message

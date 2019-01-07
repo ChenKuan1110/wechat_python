@@ -52,13 +52,12 @@ class Handle():
                     content = "文本内容"
                     replyMsg = reply.TextMsg(toUser, fromUser, content)
                     return replyMsg.send()
-                if recMsg.MsgType == 'image':
-                    mediaId = recMsg.MsgId  # 获取图片的mediaId
-                    print("MediaId:" + mediaId)
+                if recMsg.MsgType == 'image':  # 图片消息
+                    mediaId = recMsg.MediaId  # 获取图片的mediaId
                     replyMsg = reply.ImageMsg(toUser, fromUser, mediaId)
                     return replyMsg.send()
-                else:  # 其他消息，暂不处理
-                    return reply.Msg.send()
+                else:  # 回复"success"
+                    return reply.Msg().send()
 
             else:
                 print("暂不处理该消息")
