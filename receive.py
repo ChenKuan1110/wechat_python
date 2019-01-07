@@ -1,4 +1,6 @@
-"""消息接收"""
+"""消息接收
+    从公众号后台发送过来的xml数据包
+"""
 
 import xml.etree.ElementTree as ET
 
@@ -8,7 +10,19 @@ def parse_xml(web_data):
         return None
     xmlData = ET.fromstring(web_data)
     msg_type = xmlData.find('MsgType').text
-    if msg_type == 'text':  # 文本消息
+    if msg_type == 'event':
+        event_type = xmlData.find('Event').text
+        if event_type == 'CLICK':
+            return Click(xmlData)
+        # elif event_type in ('subscribe', 'unsubscribe'):
+        # return Subscribe(xmlData)
+        # elif event_type == 'VIEW':
+        # return View(xmlData)
+        # elif event_type == 'LOCATION':
+        # return LocationEvent(xmlData)
+        elif event_type == 'scancode_waitmsg':
+            return ScanCodePush(xmlData)
+    elif msg_type == 'text':  # 文本消息
         return TextMsg(xmlData)
     elif msg_type == 'image':  # 图片消息
         return ImageMsg(xmlData)
@@ -42,3 +56,32 @@ class ImageMsg(Msg):
         super().__init__(xmlData)
         self.PicUrl = xmlData.find('PicUrl').text
         self.MediaId = xmlData.find('MediaId').text
+
+
+class EventMsg():
+    """事件推送消息类"""
+
+    def __init__(self, xmlData):
+        self.ToUserName = xmlData.find('ToUserName').text
+        self.FromUserName = xmlData.find('FromUserName').text
+        self.CreateTime = xmlData.find('CreateTime').text
+        self.MsgType = xmlData.find('MsgType').text
+        self.Event = xmlData.find('Event').text
+
+
+class Click(EventMsg):
+    """Click菜单的推送消息类"""
+
+    def __init__(self, xmlData):
+        super().__init__(xmlData)
+        self.EventKey = xmlData.find('EventKey').text
+
+
+class ScanCodePush(EventMsg):
+    """扫码等待事件的推送消息"""
+
+    def __init__(self, xmlData):
+        super().__init__(xmlData)
+        self.EventKey = xmlData.find("EventKey").text
+        self.ScanType = xmlData.find("ScanCodeInfo").find('ScanType').text
+        self.ScanResult = xmlData.find("ScanCodeInfo").find("ScanResult").text

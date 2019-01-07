@@ -43,10 +43,12 @@ class Handle():
             webData = web.data()
             print("收到的消息是：\n" + webData.decode())
             recMsg = receive.parse_xml(webData)
-            # 判断xml是否是消息类型
-            if isinstance(recMsg, receive.Msg):
-                toUser = recMsg.FromUserName  # 获取发送发
-                fromUser = recMsg.ToUserName  # 获取消息接收方
+
+            toUser = recMsg.FromUserName  # 获取发送发
+            fromUser = recMsg.ToUserName  # 获取消息接收方
+
+            # 判断xml是何种消息类型
+            if isinstance(recMsg, receive.Msg):  # 普通消息类型
                 # 判断消息类型，回复消息
                 if recMsg.MsgType == 'text':  # 文本消息
                     content = "文本内容"
@@ -58,9 +60,25 @@ class Handle():
                     return replyMsg.send()
                 else:  # 回复"success"
                     return reply.Msg().send()
+            if isinstance(recMsg, receive.EventMsg):  # 事件推送类型
+                # 判断事件推送的类型
+                if recMsg.Event == 'CLICK':
+                    # 根据不同的事件值来相应不同的内容
+                    if recMsg.EventKey == "click":
+                        content = "开发中..."
+                        replyMsg = reply.TextMsg(toUser, fromUser, content)
+                        return replyMsg.send()
+                if recMsg.Event == "scancode_waitmsg":
+                    if recMsg.EventKey == "scancode2":
+                        content = recMsg.ScanResult
+                        print(content)
+                        replyMsg = reply.TextMsg(toUser, fromUser, content)
+                        return replyMsg.send()
+
+
 
             else:
                 print("暂不处理该消息")
-                return reply.Msg.send()
+                return reply.Msg().send()
         except Exception as e:
             print(e)
